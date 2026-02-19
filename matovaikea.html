@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<style>
+body {
+text-align:center;
+background-color: darkred;
+}
+</style>
+<body>
+<h1> Matopeli/keskitaso </h1>
+<canvas id="tila"></canvas>
+
+<script>
+let ruutukoko = 25;
+let rivi = 20;
+let sara = 20;
+let tila;
+let context;
+let GameOver = false;
+
+let mato = {
+X: Math.floor(Math.random() * sara) * ruutukoko,
+Y: Math.floor(Math.random() * rivi) * ruutukoko,
+keho: []
+}
+
+let nopeus = {
+X: 0,
+Y: 0,
+}
+
+let speed = 1000;
+
+let omena = {
+X: Math.floor(Math.random() * sara) * ruutukoko,
+Y: Math.floor(Math.random() * rivi) * ruutukoko
+}
+
+window.onload = function() {
+ tila = document.getElementById("tila");
+tila.height = rivi * ruutukoko;
+tila.width = sara * ruutukoko;
+context = tila.getContext("2d");
+
+asetaomena();
+document.addEventListener("keyup", muutasuunta);
+
+setInterval(päivitä, speed/10);
+}
+
+
+function päivitä() {
+
+if (GameOver) {
+window.location.href = "matokeskus.html";
+return;
+}
+ context.fillStyle="black";
+context.fillRect(0, 0, tila.width, tila.height);
+
+context.fillStyle="gray";
+context.fillRect(omena.X, omena.Y, ruutukoko, ruutukoko)
+
+if (mato.X == omena.X && mato.Y == omena.Y) {
+clearInterval(päivitä);
+speed = speed - 2;
+setInterval(päivitä, speed/10);
+mato.keho.push([omena.X, omena.Y])
+mato.keho.push([omena.X, omena.Y])
+
+asetaomena();
+}
+
+for (let i = mato.keho.length-1; i > 0; i--) {
+ mato.keho[i] = mato.keho[i-1];
+}
+if (mato.keho.length) {
+mato.keho[0] = [mato.X, mato.Y];
+}
+
+
+context.fillStyle="blue";
+mato.X += nopeus.X * ruutukoko;
+mato.Y += nopeus.Y * ruutukoko;
+context.fillRect(mato.X, mato.Y, ruutukoko, ruutukoko);
+
+context.fillStyle="cyan";
+for (let i = 0; i < mato.keho.length; i++) {
+context.fillRect(mato.keho[i][0], mato.keho[i][1], ruutukoko, ruutukoko);
+}
+
+if (mato.X < 0 || mato.X > sara*ruutukoko || mato.Y < 0 || mato.Y > rivi*ruutukoko) {
+GameOver = true;
+alert("törmäsit seinään");
+}
+
+for (let i = 0; i < mato.keho.length; i++) {
+if (mato.X == mato.keho[i][0] && mato.Y == mato.keho[i][1]) {
+GameOver = true;
+alert("törmäsit ittees");
+}
+}
+
+}
+
+function muutasuunta(e) {
+if (e.code == "ArrowUp" && nopeus.Y != 1) {
+ nopeus.X = 0;
+ nopeus.Y = -1;
+}
+else if (e.code == "ArrowDown" && nopeus.Y != -1) {
+ nopeus.X = 0;
+ nopeus.Y = 1;
+}
+else if (e.code == "ArrowLeft" && nopeus.X != 1) {
+ nopeus.X = -1;
+ nopeus.Y = 0;
+}
+else if (e.code == "ArrowRight" && nopeus.X != -1) {
+ nopeus.X = 1;
+ nopeus.Y = 0;
+}
+}
+
+function asetaomena() {
+omena.X = Math.floor(Math.random() * sara) * ruutukoko;
+omena.Y = Math.floor(Math.random() * rivi) * ruutukoko;
+}
+
+</script>
+</body>
+</html>
+
